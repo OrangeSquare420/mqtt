@@ -4,7 +4,7 @@ import base64
 import unicodedata
 from paho.mqtt.properties import Properties
 from paho.mqtt.packettypes import PacketTypes
-
+import os 
 # Funksjon for å normalisere strenger (brukernavn og passord)
 def normalize_string(input_string):
     return unicodedata.normalize('NFKC', input_string)
@@ -29,17 +29,16 @@ def publish_status_message(client, status_topic, message):
     print(f"Published status message: '{message}' to topic: {status_topic}")
 
 # MQTT Broker-innstillinger
-mqtt_broker = "junction.proxy.rlwy.net"
-mqtt_port = 11898
-mqtt_user = "scram"
-mqtt_pass = "scram"
+mqtt_broker = os.getenv('mqtt_broker')
+mqtt_port = os.getenv('mqtt_port')
+mqtt_user = os.getenv('mqtt_user')
+mqtt_pass = os.getenv('mqtt_pwd')
 
-# Enhetens serienummer
-device_serial_number = "BKQ90NKC3D"
+device_series_number = os.getenv('device_series_number')
 
 # MQTT-emner basert på enhetens serienummer
-toggle_topic = f"{device_serial_number}/toggle"
-status_topic = f"{device_serial_number}/status"
+toggle_topic = f"{device_series_number}/toggle"
+status_topic = f"{device_series_number}/status"
 
 # SCRAM-autentisering
 client_first_message, hashed_password, client_nonce = generate_scram_message(mqtt_user, mqtt_pass)
@@ -90,7 +89,7 @@ def on_message(client, userdata, message):
     print(f"Received message: {message.payload.decode()} on topic {message.topic}")
 
 # Initialiser MQTT-klient
-client = mqtt.Client(client_id=f"client_{device_serial_number}", protocol=mqtt.MQTTv5)
+client = mqtt.Client(client_id=f"client_{device_series_number}", protocol=mqtt.MQTTv5)
 client.on_connect = on_connect
 client.on_message = on_message
 client.on_auth = on_auth

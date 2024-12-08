@@ -1,7 +1,8 @@
 import paho.mqtt.client as mqtt
+import os
 
-broker = "junction.proxy.rlwy.net"
-port = 10320  # Samme port som brukes i publisher
+mqtt_broker = os.getenv('mqtt_broker')
+mqtt_port = os.getenv('mqtt_port')
 
 # Callback for når klienten kobler til broker
 def on_connect(client, userdata, flags, rc):
@@ -19,7 +20,7 @@ client.on_connect = on_connect
 client.on_message = on_message
 
 try:
-    client.connect(broker, port, 60)
+    client.connect(mqtt_broker, mqtt_port, 60)
     print("Connected to MQTT broker")
     client.loop_forever()  # Blokkerer og lytter etter meldinger
 except Exception as e:
